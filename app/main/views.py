@@ -9,6 +9,7 @@ from .. import db
 from ..models import Permission, Role, User, Post, Comment
 from ..decorators import admin_required, permission_required
 
+
 @main.after_app_request
 def after_request(response):
     for query in get_debug_queries():
@@ -16,7 +17,7 @@ def after_request(response):
             current_app.logger.warning(
                 'Slow query: %s\nParameters: %s\nDuration: %fs\nContext: %s\n'
                 % (query.statement, query.parameters, query.duration,
-                query.context))
+                   query.context))
     return response
 
 
@@ -25,7 +26,8 @@ def index():
     form = PostForm()
     if current_user.can(Permission.WRITE_ARTICLES) and \
             form.validate_on_submit():
-        post = Post(body=form.body.data, author=current_user._get_current_object())
+        post = Post(body=form.body.data,
+                    author=current_user._get_current_object())
         db.session.add(post)
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
@@ -41,5 +43,4 @@ def index():
         error_out=False)
     posts = pagination.items
     return render_template('index.html', form=form, posts=posts,
-                            show_followed=show_followed, pagination=pagination)
-
+                           show_followed=show_followed, pagination=pagination)
